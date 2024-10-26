@@ -3,6 +3,7 @@ local utils = require("neotest-gtest.utils")
 local lib = require("neotest.lib")
 local neotest = require("neotest")
 local cmake_tools = require("cmake-tools")
+local config = require("neotest-gtest.config")
 
 local ADAPTER_PREFIX = "neotest-gtest:"
 
@@ -131,7 +132,22 @@ function ExecutablesRegistry:update_executable(node_id, executable)
 end
 
 function ExecutablesRegistry:discover_cmake_executables()
+  local model_info = cmake_tools.get_model_info()
+  local build_dir = cmake_tools.get_build_directory()
+  for _, target_info in pairs(model_info) do
+    if target_info.type == "EXECUTABLE" then
+      local executable_path = target_info.artifacts[1].path
+      for _, source in ipairs(target_info.sources) do
+        if config.is_test_file(source.path) then
+          self._node2executable[self._root_dir .. "/" .. source.path] = build_dir
+            .. "/"
+            .. executable_path
+        end
+      end
+    end
+  end
 end
+
 function ExecutablesRegistry:_iter_children(node_id)
   -- TODO: keep a root tree cached
   local node = self._tree:get_key(node_id)
