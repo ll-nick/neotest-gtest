@@ -2,6 +2,7 @@ local Storage = require("neotest-gtest.storage")
 local utils = require("neotest-gtest.utils")
 local lib = require("neotest.lib")
 local neotest = require("neotest")
+local cmake_tools = require("cmake-tools")
 
 local ADAPTER_PREFIX = "neotest-gtest:"
 
@@ -129,6 +130,8 @@ function ExecutablesRegistry:update_executable(node_id, executable)
   self._storage:flush()
 end
 
+function ExecutablesRegistry:discover_cmake_executables()
+end
 function ExecutablesRegistry:_iter_children(node_id)
   -- TODO: keep a root tree cached
   local node = self._tree:get_key(node_id)

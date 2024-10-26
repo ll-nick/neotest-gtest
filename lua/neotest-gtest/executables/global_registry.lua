@@ -1,4 +1,5 @@
 local utils = require("neotest-gtest.utils")
+local cmake_tools = require("cmake-tools")
 local ExecutablesRegistry = require("neotest-gtest.executables.registry")
 
 ---@class neotest-gtest.GlobalExecutableRegistry
@@ -21,6 +22,9 @@ function GlobalExecutableRegistry:for_dir(_root_dir)
   local normalized = utils.normalize_path(_root_dir)
   if self._root2registry[normalized] == nil then
     self._root2registry[normalized] = ExecutablesRegistry:new(normalized)
+  end
+  if cmake_tools.is_cmake_project() then
+    self._root2registry[normalized]:discover_cmake_executables()
   end
   return self._root2registry[normalized]
 end
