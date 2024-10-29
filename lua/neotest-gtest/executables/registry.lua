@@ -133,15 +133,16 @@ end
 
 function ExecutablesRegistry:discover_cmake_executables()
   local model_info = cmake_tools.get_model_info()
-  local build_dir = cmake_tools.get_build_directory()
+  local build_dir = utils.normalize_path(tostring(cmake_tools.get_build_directory()))
+
   for _, target_info in pairs(model_info) do
     if target_info.type == "EXECUTABLE" then
-      local executable_path = target_info.artifacts[1].path
+      local executable_path_relative = target_info.artifacts[1].path
+      local executable_path = build_dir .. lib.files.sep .. executable_path_relative
       for _, source in ipairs(target_info.sources) do
         if config.is_test_file(source.path) then
-          self._node2executable[self._root_dir .. "/" .. source.path] = build_dir
-            .. "/"
-            .. executable_path
+          local source_path = utils.normalize_path(source.path)
+          self._node2executable[source_path] = executable_path
         end
       end
     end
